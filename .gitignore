@@ -49,6 +49,7 @@ env.sh
 # #################
 data/
 test/
-trained_model.json
-trained_model.txt
 
+# Project #
+# #################
+*.txt
