@@ -7,31 +7,31 @@ Computes the inner product of two vectors using threading.
 
 import argparse
 import os
-import time
 import threading
 
 
-# Code goes here
+def inner_product_parallel(x, y):
+    xy_products = []
+
+    for x_i, y_i in zip(x, y):
+        t = threading.Thread(target=lambda a, b: xy_products.append(a * b), args=(x_i, y_i))
+        t.start()
+
+    return sum(xy_products)
 
 
 def inner_product(x, y):
     return sum([x_i * y_i for x_i, y_i in zip(x, y)])
 
 
-def inner_product_parallel(x, y):
-    pass
-
-
 def parse_vector_file(filename):
-    if os.path.exists(filename):
-        pass
-    else:
+    if not os.path.exists(filename):
         raise Exception('Vector file not found')
 
     x = []
     y = []
 
-    with open(filename) as f:
+    with open(filename, 'r') as f:
         for line in f:
             x_i, y_i = line.split(',')
 
@@ -57,4 +57,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     x, y = parse_vector_file(args.filename_with_vector_data)
-    print(inner_product(x, y))
+    print(inner_product_parallel(x, y))

@@ -53,3 +53,4 @@ test/
 # Project #
 # #################
 *.txt
+!test.txt
