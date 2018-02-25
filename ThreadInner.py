@@ -13,9 +13,13 @@ import threading
 def inner_product_parallel(x, y):
     xy_products = []
 
+    threads = []
     for x_i, y_i in zip(x, y):
         t = threading.Thread(target=lambda a, b: xy_products.append(a * b), args=(x_i, y_i))
         t.start()
+
+    for thread in threads:
+        thread.join()
 
     return sum(xy_products)
 
