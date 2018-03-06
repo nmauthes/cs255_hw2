@@ -31,7 +31,18 @@ def parse_vector_file(filename):
     return x, y
 
 def pyocl_inner_product(x , y):
+    '''Creates two np arrays with the provided data.
+       A third np array is created that stores the result.
+       The OpenCL kernel multiplies the two arrays in parallel.
+       A barrier function ensures that all multiplication
+       operations have finished before proceeding. 
 
+       Each work item is responsible for adding its neighbour at
+       some distance which is a multiple of 2 provided its 
+       global id is divisible by a multiple of 2.
+
+       Effectively the for loop terminates in O (log n) steps.
+    '''
     a = np.array(x).astype(np.int32)
     b = np.array(y).astype(np.int32)
 
@@ -47,20 +58,25 @@ def pyocl_inner_product(x , y):
         __kernel void inner_product(__global const int *a,
         __global const int *b, __global int *c)
         {
-        int gid = get_global_id(0);
-        c[gid] = a[gid] * b[gid];
+            int gid = get_global_id(0);
+            c[gid] = a[gid] * b[gid];
+            barrier(CLK_GLOBAL_MEM_FENCE);
+
+            int group_size = get_global_size(0);
+            
+            for(int i = 2; i/2<=group_size; i*=2)
+            {
+                if(gid % i == 0 && (gid + i/2) <=group_size)
+                    c[gid] += c[gid + i/2];
+                
+                barrier(CLK_LOCAL_MEM_FENCE);
+            }
         }
         """).build()
 
-    #kernel = prg.inner_product
-    #kernel.set_scalar_arg_dtypes( [None, np.int32, None] )
     prg.inner_product(queue, a.shape, None, a_dev.data, b_dev.data, result.data)
 
-    #result = np.zeros(a.shape, np.int32)
-    #future = cl.enqueue_copy(queue, result, result_prg)
-    #future.wait()
-
-    print(sum(result))
+    print(result)
 
 
 parser = argparse.ArgumentParser(
