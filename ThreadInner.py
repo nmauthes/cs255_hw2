@@ -11,6 +11,14 @@ import threading
 
 
 def inner_product_parallel(x, y):
+    '''
+    Compute the inner products of two vectors using parallel threads.
+
+    :param x: The first vector
+    :param y: The second vector
+    :return: Inner product of x and y
+    '''
+
     xy_products = []
 
     threads = []
@@ -26,10 +34,25 @@ def inner_product_parallel(x, y):
 
 
 def inner_product(x, y):
+    '''
+        A simple sequential function to compute the inner products of two vectors.
+
+        :param x: The first vector
+        :param y: The second vector
+        :return: Inner product of x and y
+    '''
+
     return sum([x_i * y_i for x_i, y_i in zip(x, y)])
 
 
 def parse_vector_file(filename):
+    '''
+    A function for parsing vectors from text data in .txt file.
+
+    :param filename: The path of the vector file
+    :return: The parsed vectors x and y
+    '''
+
     if not os.path.exists(filename):
         raise Exception('Vector file not found')
 
